@@ -1,0 +1,214 @@
+# Path to the test file (Liquid template)
+#
+# Variables:
+#
+# - `manifest_dir`: Package directory
+# - `contest`:      Contest ID (e.g. "abc100")
+# - `bin_name`:     Name of a `bin` target (e.g. "abc100-a")
+# - `bin_alias`:    "Alias" for a `bin` target defined in `pacakge.metadata.cargo-compete` (e.g. "a")
+# - `problem`:      Alias for `bin_alias` (deprecated)
+#
+# Additional filters:
+#
+# - `kebabcase`: Convert to kebab case (by using the `heck` crate)
+test-suite = "{{ manifest_dir }}/testcases/{{ bin_alias }}.yml"
+
+# Open files with the command (`jq` command that outputs `string[] | string[][]`)
+#
+# VSCode:
+#open = '[["code", "-a", .manifest_dir], ["code"] + (.paths | map([.src, .test_suite]) | flatten)]'
+# Emacs:
+#open = '["emacsclient", "-n"] + (.paths | map([.src, .test_suite]) | flatten)'
+
+[template]
+src = '''#![allow(unused_imports)]
+
+use std::cmp::{
+    max, min, Ordering,
+    Ordering::{Equal, Greater, Less},
+    Reverse,
+};
+use std::collections::{BTreeMap, BTreeSet, BinaryHeap, HashMap, HashSet, VecDeque};
+use std::convert::{TryFrom, TryInto};
+use std::fmt;
+use std::mem::swap;
+use std::num::Wrapping;
+use std::ops::{
+    Add, AddAssign, BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Div, DivAssign,
+    Index, IndexMut, Mul, MulAssign, Neg, Rem, RemAssign, Shl, ShlAssign, Shr, ShrAssign, Sub,
+    SubAssign,
+};
+use std::process::exit;
+use std::{f32, f64, i128, i16, i32, i64, i8, isize, u128, u16, u32, u64, u8, usize};
+
+use itertools::Itertools as _;
+use itertools_num::ItertoolsNum as _;
+use maplit;
+use num_bigint::{BigInt, BigUint};
+use num_complex::Complex;
+use num_integer::{binomial, gcd, lcm, multinomial, Integer};
+use num_rational::Rational;
+use num_traits::{
+    clamp, one, pow, zero, Num, NumAssignOps, NumOps, One, Pow, Signed, Unsigned, Zero,
+};
+use permutohedron::Heap;
+use proconio::marker::{Bytes, Chars, Isize1, Usize1};
+use rand::{random, rngs::SmallRng, Rng, SeedableRng};
+
+use ac_library_rs::{
+    convolution, convolution_i64, crt, floor_sum, inv_mod, lcp_array, lcp_array_arbitrary, pow_mod,
+    suffix_array, suffix_array_arbitrary, suffix_array_manual, z_algorithm, z_algorithm_arbitrary,
+    Additive, Dsu, Edge, FenwickTree, LazySegtree, MapMonoid, Max, MfGraph, Min, MinCostFlowGraph,
+    ModInt, ModInt1000000007, ModInt998244353, Monoid, Multiplicative, SccGraph, Segtree, TwoSat,
+};
+
+#[macro_use]
+extern crate argio as _;
+
+pub use consts::*;
+pub mod consts {
+    pub const MOD10E9_7: usize = 1000000007; // 10 ^ 9 + 7
+    pub const MOD99_: usize = 998244353;
+    pub const MAX: usize = std::usize::MAX; // = 2 ^ 64 - 1 = 18446744073709551615 ≈ 1.8 * 10 ^ 19
+    pub const INF: usize = 2000000000000000000; // MAX / 9 < 2 * 10e18 < MAX / 10
+    pub const FNI: i64 = -2000000000000000000; // == -(INF as i64)
+    pub const PI: f64 = std::f64::consts::PI; // 3.141592653589793 -- 10 ^ -15
+    pub const ASCII_A_UPPER: u8 = 65;
+    pub const ASCII_A_LOWER: u8 = 97;
+    pub const ASCII_ZERO: u8 = 48;
+    pub const ADJ4: &[(isize, isize); 4] = &[(1, 0), (0, 1), (-1, 0), (0, -1)];
+    pub const ADJ8: &[(isize, isize); 8] = &[
+        (1, 0),
+        (1, 1),
+        (0, 1),
+        (-1, 1),
+        (-1, 0),
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+    ];
+}
+
+#[argio]
+fn main() {
+    todo!("solve it!");
+}
+
+'''
+
+[template.new]
+# `profile` for `Cargo.toml`.
+#
+# By setting this, you can run tests with `opt-level=3` while enabling `debug-assertions` and `overflow-checks`.
+#profile = '''
+#[dev]
+#opt-level = 3
+#'''
+dependencies = '''
+num = "=0.2.1"
+num-bigint = "=0.2.6"
+num-complex = "=0.2.4"
+num-integer = "=0.1.42"
+num-iter = "=0.1.40"
+num-rational = "=0.2.4"
+num-traits = "=0.2.11"
+num-derive = "=0.3.0"
+ndarray = "=0.13.0"
+nalgebra = "=0.20.0"
+alga = "=0.9.3"
+libm = "=0.2.1"
+rand = { version = "=0.7.3", features = ["small_rng"] }
+getrandom = "=0.1.14"
+rand_chacha = "=0.2.2"
+rand_core = "=0.5.1"
+rand_hc = "=0.2.0"
+rand_pcg = "=0.2.1"
+rand_distr = "=0.2.2"
+petgraph = "=0.5.0"
+indexmap = "=1.3.2"
+regex = "=1.3.6"
+lazy_static = "=1.4.0"
+ordered-float = "=1.0.2"
+ascii = "=1.0.0"
+permutohedron = "=0.2.4"
+superslice = "=1.0.0"
+itertools = "=0.9.0"
+itertools-num = "=0.1.3"
+maplit = "=1.0.2"
+either = "=1.5.3"
+im-rc = "=14.3.0"
+fixedbitset = "=0.2.0"
+bitset-fixed = "=0.1.0"
+proconio = { version = "=0.3.6", features = ["derive"] }
+text_io = "=0.1.8"
+whiteread = "=0.5.0"
+rustc-hash = "=1.1.0"
+smallvec = "=1.2.0"
+
+argio = "0.1.4"
+
+ac-library-rs-parted             = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-convolution = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-dsu         = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-fenwicktree = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-lazysegtree = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-math        = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-maxflow     = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-mincostflow = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-modint      = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-scc         = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-segtree     = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-string      = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+ac-library-rs-parted-twosat      = { git = "https://github.com/qryxip/ac-library-rs-parted" }
+'''
+
+[template.new.copy-files]
+"./template-cargo-lock.toml" = "Cargo.lock"
+
+[new]
+kind = "cargo-compete"
+# Platform
+#
+# - atcoder
+# - codeforces
+# - yukicoder
+platform = "atcoder"
+# Path (Liquid template)
+#
+# Variables:
+#
+# - `contest`:      Contest ID. **May be nil**
+# - `package_name`: Package name
+path = "./{{ contest }}"
+
+#[new]
+#kind = "oj-api"
+#url = "https://atcoder.jp/contests/{{ id }}"
+#path = "./{{ contest }}"
+
+# for Library-Checker
+#[add]
+#url = "https://judge.yosupo.jp/problem/{{ args[0] }}"
+##is-contest = ["false"] # optional
+#bin-name = '{{ args[0] }}'
+##bin-alias = '{{ args[0] }}' # optional
+##bin-src-path = './src/bin/{{ bin_alias }}.rs' # optional
+
+# for yukicoder
+#[add]
+#url = '{% case args[0] %}{% when "contest" %}https://yukicoder.me/contests/{{ args[1] }}{% when "problem" %}https://yukicoder.me/problems/no/{{ args[1] }}{% endcase %}'
+#is-contest = ["bash", "-c", '[[ $(cut -d / -f 4) == "contests" ]]'] # optional
+#bin-name = '{% assign segments = url | split: "/" %}{{ segments[5] }}'
+##bin-alias = '{% assign segments = url | split: "/" %}{{ segments[5] }}' # optional
+##bin-src-path = './src/bin/{{ bin_alias }}.rs' # optional
+
+[test]
+# Profile for `cargo build`. ("dev" | "release")
+#
+# Defaults to `"dev"`.
+#profile = "dev"
+
+[submit.transpile]
+kind = "command"
+args = ["cargo", "equip", "--exclude-atcoder-crates", "--resolve-cfgs", "--remove", "docs", "--minify", "libs", "--rustfmt", "--check", "--bin", "{{ bin_name }}"]
+language_id = "4050"
